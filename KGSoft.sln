@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KGSoft.TinyHttpClient", "KGSoft.TinyHttpClient\KGSoft.TinyHttpClient.csproj", "{4588C7A1-3366-47C2-B7FD-20BA8A78AAB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4588C7A1-3366-47C2-B7FD-20BA8A78AAB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4588C7A1-3366-47C2-B7FD-20BA8A78AAB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4588C7A1-3366-47C2-B7FD-20BA8A78AAB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4588C7A1-3366-47C2-B7FD-20BA8A78AAB7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {167F0596-F620-4906-89AA-D2150D6DF18E}
+	EndGlobalSection
+EndGlobal
