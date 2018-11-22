@@ -128,15 +128,8 @@ namespace KGSoft.TinyHttpClient
         /// <returns></returns>
         private static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
         {
-            HttpRequestMessage request = new HttpRequestMessage(method, url);
-            LogHelper.LogMessage($"[{method.Method}]: {url}");
-
-            if (!string.IsNullOrEmpty(body))
-                request.Content = CreateContent(body);
-
-            var message = await HttpClientPool.Client.SendAsync(request, tkn);
+            var message = await GetResponseMessage(url, method, body, tkn);
             LogHelper.LogMessage($"[ResponseCode]: {message.StatusCode}");
-
             return await message.BuildResponse<T>();
         }
 
@@ -150,16 +143,28 @@ namespace KGSoft.TinyHttpClient
         /// <returns></returns>
         private static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
         {
+            var message = await GetResponseMessage(url, method, body, tkn);
+            LogHelper.LogMessage($"[ResponseCode]: {message.StatusCode}");
+            return await message.BuildResponse();
+        }
+
+        /// <summary>
+        /// Create and send an HttpRequestMessage
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="method"></param>
+        /// <param name="body"></param>
+        /// <param name="tkn"></param>
+        /// <returns></returns>
+        private static Task<HttpResponseMessage> GetResponseMessage(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
+        {
             HttpRequestMessage request = new HttpRequestMessage(method, url);
             LogHelper.LogMessage($"[{method.Method}]: {url}");
 
             if (!string.IsNullOrEmpty(body))
                 request.Content = CreateContent(body);
 
-            var message = await HttpClientPool.Client.SendAsync(request, tkn);
-            LogHelper.LogMessage($"[ResponseCode]: {message.StatusCode}");
-
-            return await message.BuildResponse();
+            return HttpClientPool.Client.SendAsync(request, tkn);
         }
 
         /// <summary>
