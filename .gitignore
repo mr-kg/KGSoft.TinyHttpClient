@@ -5,3 +5,6 @@
 /.vs/KGSoft
 /KGSoft.TinyHttpClient/bin/Debug
 /KGSoft.TinyHttpClient/obj
+/KGSoft.TinyHttpClient.Tests/bin/Debug
+/KGSoft.TinyHttpClient.Tests/obj/Debug
+/packages
