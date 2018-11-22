@@ -8,3 +8,6 @@
 /KGSoft.TinyHttpClient.Tests/bin/Debug
 /KGSoft.TinyHttpClient.Tests/obj/Debug
 /packages
+/KGSoft.TinyHttpClient/bin/Release
+/KGSoft.TinyHttpClient.Tests/bin/Release
+/KGSoft.TinyHttpClient.Tests/obj/Release

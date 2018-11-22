@@ -1,7 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>KGSoft</Authors>
+    <Product>TinyHttpClient</Product>
+    <PackageProjectUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</RepositoryUrl>
+    <PackageTags>httpclient, restclient, netstandard, http-client, rest-api, rest-client</PackageTags>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageIconUrl>https://www.mr-kg.com/wp-content/uploads/2018/11/httphelper.jpg</PackageIconUrl>
+    <Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
   </PropertyGroup>
 
   <ItemGroup>
