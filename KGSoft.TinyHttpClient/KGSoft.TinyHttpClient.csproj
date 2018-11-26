@@ -10,6 +10,7 @@
     <PackageReleaseNotes>Initial release</PackageReleaseNotes>
     <PackageIconUrl>https://www.mr-kg.com/wp-content/uploads/2018/11/httphelper.jpg</PackageIconUrl>
     <Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

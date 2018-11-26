@@ -129,8 +129,11 @@ namespace KGSoft.TinyHttpClient
         private static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
         {
             var message = await GetResponseMessage(url, method, body, tkn);
-            LogHelper.LogMessage($"[ResponseCode]: {message.StatusCode}");
-            return await message.BuildResponse<T>();
+            var response = await message.BuildResponse<T>();
+
+            HandleLogging(response);
+
+            return response;
         }
 
         /// <summary>
@@ -144,8 +147,32 @@ namespace KGSoft.TinyHttpClient
         private static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
         {
             var message = await GetResponseMessage(url, method, body, tkn);
-            LogHelper.LogMessage($"[ResponseCode]: {message.StatusCode}");
-            return await message.BuildResponse();
+            var response = await message.BuildResponse();
+
+            HandleLogging(response);
+
+            return response;
+        }
+
+        /// <summary>
+        /// Handles logging based on defined LogScope
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="message"></param>
+        private static void HandleLogging(Response response)
+        {
+            if (HttpConfig.LogScope == Enums.LogScope.OnlyFailedRequests && !response.IsSuccess)
+                Log(response);
+            else if (HttpConfig.LogScope == Enums.LogScope.AllRequests)
+                Log(response);
+
+            void Log(Response r)
+            {
+                LogHelper.LogMessage(string.Format("{0}[ResponseCode]: {1} - {2}",
+                        response.IsSuccess ? string.Empty : "FAILED HTTP REQUEST - ",
+                        response.StatusCode,
+                        response.Message));
+            }
         }
 
         /// <summary>
@@ -156,15 +183,21 @@ namespace KGSoft.TinyHttpClient
         /// <param name="body"></param>
         /// <param name="tkn"></param>
         /// <returns></returns>
-        private static Task<HttpResponseMessage> GetResponseMessage(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
+        private static async Task<HttpResponseMessage> GetResponseMessage(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken))
         {
             HttpRequestMessage request = new HttpRequestMessage(method, url);
             LogHelper.LogMessage($"[{method.Method}]: {url}");
 
             if (!string.IsNullOrEmpty(body))
                 request.Content = CreateContent(body);
+            
+            // Fire any pre-auth delegates before sending the request
+            HttpConfig.PreRequestAuthAction?.Invoke();
+            if (HttpConfig.PreRequestAuthAsyncFunc != null)
+                await HttpConfig.PreRequestAuthAsyncFunc();
 
-            return HttpClientPool.Client.SendAsync(request, tkn);
+            var message = await HttpClientPool.Client.SendAsync(request, tkn);
+            return message;
         }
 
         /// <summary>

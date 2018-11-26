@@ -18,7 +18,12 @@ namespace KGSoft.TinyHttpClient
             var response = r.Convert<T>();
 
             if (typeof(T) != typeof(string) && message.IsSuccessStatusCode)
-                response.Result = JsonConvert.DeserializeObject<T>(response.Message);
+            {
+                if (HttpConfig.MediaTypeHeader == Constants.ApplicationJson)
+                    response.Result = JsonConvert.DeserializeObject<T>(response.Message);
+                else
+                    Logging.LogHelper.LogMessage($"Unable to auto-deserialize MIME type: {HttpConfig.MediaTypeHeader} into Response.Result<T>. Please manually deserialize Response.Message instead.");
+            }
 
             return response;
         }
