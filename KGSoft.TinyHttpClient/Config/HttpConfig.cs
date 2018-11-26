@@ -1,6 +1,9 @@
 ﻿using KGSoft.TinyHttpClient.Logging;
+using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using static KGSoft.TinyHttpClient.Enums;
 
 namespace KGSoft.TinyHttpClient
 {
@@ -9,9 +12,41 @@ namespace KGSoft.TinyHttpClient
     /// </summary>
     public static class HttpConfig
     {
-        public static string MediaTypeHeader = "application/json";
+        /// <summary>
+        /// The MIME type we are expecting to use
+        /// </summary>
+        public static string MediaTypeHeader = Constants.ApplicationJson;
+
+        /// <summary>
+        /// Default Authorization header
+        /// </summary>
         public static AuthenticationHeaderValue DefaultAuthHeader = null;
-        public static Dictionary<string, string> CustomHeaders;
+
+        /// <summary>
+        /// Custom headers we need to add to our requests
+        /// </summary>
+        public static Dictionary<string, string> CustomHeaders = new Dictionary<string, string>();
+
+        /// <summary>
+        /// The scope of the logger
+        /// </summary>
+        public static LogScope LogScope = LogScope.OnlyFailedRequests;
+
+        /// <summary>
+        /// The Logger instance to be used by the entire context
+        /// </summary>
         public static ILogger Logger;
+
+        /// <summary>
+        /// An action to invoke pre-request.
+        /// Can be used for acquiring OAuth tokens and adding them as Custom Headers
+        /// </summary>
+        public static Action PreRequestAuthAction;
+
+        /// <summary>
+        /// A function to invoke pre-request.
+        /// Can be used for acquiring OAuth tokens and adding them as Custom Headers
+        /// </summary>
+        public static Func<Task> PreRequestAuthAsyncFunc;
     }
 }
