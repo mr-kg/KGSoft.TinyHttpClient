@@ -7,7 +7,7 @@ This library was created out if necessity, as it contains code we seemed to be d
 
 * Encapsulation of types expected from an HttpRequest (Request and Request of T)
 * Logging capability
-* Global set and forget config
+* Global set and forget config (With the ability to manipulate headers on a request-by-request basis if needed)
 * Re-use of HttpClient (HttpClient pool functionality coming soon)
 * Pre-request async authentication (useful for ADAL requests where you need to get/refresh an ADAL token on every request)
 
