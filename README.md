@@ -11,6 +11,11 @@ This library was created out if necessity, as it contains code we seemed to be d
 * Re-use of HttpClient (HttpClient pool functionality coming soon)
 * Pre-request async authentication (useful for ADAL requests where you need to get/refresh an ADAL token on every request)
 
+## Coming soon
+
+* 401 Callback action (Would be useful for token expiry situations)
+* Suggestions welcome!
+
 ## Nuget
 https://www.nuget.org/packages/KGSoft.TinyHttpClient/
 
