@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using KGSoft.TinyHttpClient.Tests.Model;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -11,6 +13,12 @@ namespace KGSoft.TinyHttpClient.Tests
     public class HttpRequestTests
     {
         const string ApiBase = "https://reqres.in/";
+        static AuthenticationHeaderValue authHeader = new AuthenticationHeaderValue("Bearer", "XYZ");
+        static Dictionary<string, string> customHeaders = new Dictionary<string, string>() { { "CustomKey", "CustomValue" } };
+
+        HeaderConfig cfgAuthHeader = new HeaderConfig() { AuthHeader = authHeader };
+        HeaderConfig cfgCustomHeaders = new HeaderConfig() { CustomHeaders = customHeaders };
+        HeaderConfig cfgFull = new HeaderConfig() { AuthHeader = authHeader, CustomHeaders = customHeaders };
 
         private void AssertResponse(Response response)
         {
@@ -27,6 +35,34 @@ namespace KGSoft.TinyHttpClient.Tests
         public async Task Test_GET()
         {
             AssertResponse(await Helper.GetAsync(ApiBase + "api/users/2"));
+        }
+
+        [TestMethod]
+        public async Task Test_GET_GlobalHeaders()
+        {
+            HttpConfig.CustomHeaders = customHeaders;
+            HttpConfig.DefaultAuthHeader = authHeader;
+            AssertResponse(await Helper.GetAsync(ApiBase + "api/users/2"));
+            HttpConfig.CustomHeaders.Clear();
+            HttpConfig.DefaultAuthHeader = null;
+        }
+
+        [TestMethod]
+        public async Task Test_GET_AuthHeader()
+        {
+            AssertResponse(await Helper.GetAsync(ApiBase + "api/users/2", config: cfgAuthHeader ));
+        }
+
+        [TestMethod]
+        public async Task Test_GET_CustomHeader()
+        {
+            AssertResponse(await Helper.GetAsync(ApiBase + "api/users/2", config: cfgCustomHeaders));
+        }
+
+        [TestMethod]
+        public async Task Test_GET_CustomHeadersAll()
+        {
+            AssertResponse(await Helper.GetAsync(ApiBase + "api/users/2", config: cfgFull));
         }
 
         [TestMethod]
