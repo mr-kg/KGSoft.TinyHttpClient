@@ -19,6 +19,9 @@ This library was created out if necessity, as it contains code we seemed to be d
 ## Nuget
 https://www.nuget.org/packages/KGSoft.TinyHttpClient/
 
+## Further Reading
+https://www.mr-kg.com/kgsoft-tinyhttpclient-a-smarter-way-to-consume-your-apis/
+
 ## Usage
 
 #### Simple GET request, expecting a response of T
