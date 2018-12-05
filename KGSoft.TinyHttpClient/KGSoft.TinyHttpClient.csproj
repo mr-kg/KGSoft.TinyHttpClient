@@ -7,13 +7,11 @@
     <PackageProjectUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</RepositoryUrl>
     <PackageTags>httpclient, restclient, netstandard, http-client, rest-api, rest-client</PackageTags>
-    <PackageReleaseNotes>Moved Http Header from HttpClient to HttpRequestMessage, allowing more flexibility when calling different APIs
-Added optional param: HeaderConfig to all requests
-Added unit tests around new functionality
-Fleshed out param annotations</PackageReleaseNotes>
+    <PackageReleaseNotes>Added option body param to DELETE methods:
+https://www.w3.org/Protocols/rfc2616/rfc2616.html</PackageReleaseNotes>
     <PackageIconUrl>https://www.mr-kg.com/wp-content/uploads/2018/11/httphelper.jpg</PackageIconUrl>
     <Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -99,24 +99,26 @@ namespace KGSoft.TinyHttpClient
         /// Create a DELETE request without expecting a type returned
         /// </summary>
         /// <param name="url">The URL we want to make the request to</param>
+        /// <param name="body">The body we are sending with the request</param>
         /// <param name="tkn">The cancellation token we want to use with this request</param>
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
-        public static Task<Response> DeleteAsync(string url, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
+        public static Task<Response> DeleteAsync(string url, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
         {
-            return MakeHttpRequest(url, HttpMethod.Delete, string.Empty, tkn, config);
+            return MakeHttpRequest(url, HttpMethod.Delete, body, tkn, config);
         }
 
         /// <summary>
         /// Create a DELETE request expecting T in the response
         /// </summary>
         /// <param name="url">The URL we want to make the request to</param>
+        /// <param name="body">The body we are sending with the request</param>
         /// <param name="tkn">The cancellation token we want to use with this request</param>
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
-        public static Task<Response<T>> DeleteAsync<T>(string url, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
+        public static Task<Response<T>> DeleteAsync<T>(string url, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
         {
-            return MakeHttpRequest<T>(url, HttpMethod.Delete, string.Empty, tkn, config);
+            return MakeHttpRequest<T>(url, HttpMethod.Delete, body, tkn, config);
         }
         #endregion
 
