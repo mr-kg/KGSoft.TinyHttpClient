@@ -13,6 +13,7 @@ namespace KGSoft.TinyHttpClient.Tests
     public class HttpRequestTests
     {
         const string ApiBase = "https://reqres.in/";
+        const string ApiUnauthorized = "https://httpstat.us/401";
         static AuthenticationHeaderValue authHeader = new AuthenticationHeaderValue("Bearer", "XYZ");
         static Dictionary<string, string> customHeaders = new Dictionary<string, string>() { { "CustomKey", "CustomValue" } };
 
@@ -23,6 +24,11 @@ namespace KGSoft.TinyHttpClient.Tests
         private void AssertResponse(Response response)
         {
             Assert.IsTrue(response.IsSuccess);
+        }
+
+        private void AssertResponse401(Response response)
+        {
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.Unauthorized);
         }
 
         private void AssertResponseResult<T>(Response<T> response)
@@ -115,6 +121,28 @@ namespace KGSoft.TinyHttpClient.Tests
         {
             var response = await Helper.PostAsync(ApiBase + "/api/register", "{ \"email\": \"sydney@fife\" }");
             Assert.IsFalse(response.IsSuccess);
+        }
+
+        [TestMethod]
+        public async Task Test_401Action()
+        {
+            bool actionFlag = false;
+            HttpConfig.UnauthorizedResultAction = () => { actionFlag = true; };
+            AssertResponse401(await Helper.GetAsync(ApiUnauthorized));
+            Assert.IsTrue(actionFlag);
+
+            HttpConfig.UnauthorizedResultAction = null;
+        }
+
+        [TestMethod]
+        public async Task Test_401Func()
+        {
+            bool actionFlag = false;
+            HttpConfig.UnauthorizedResultAsyncFunc = () => { actionFlag = true; return Task.CompletedTask; };
+            AssertResponse401(await Helper.GetAsync(ApiUnauthorized));
+            Assert.IsTrue(actionFlag);
+
+            HttpConfig.UnauthorizedResultAsyncFunc = null;
         }
 
         /*

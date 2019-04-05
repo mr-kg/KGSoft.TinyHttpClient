@@ -162,6 +162,21 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
+        /// Evaluate whether to run any actions upon receiving a 401 Unathorized response, if any actions are sprcified in the HttpConfig
+        /// </summary>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        private static async Task HandlePostRequestUnauthorizedActions(System.Net.HttpStatusCode statusCode)
+        {
+            if (statusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                HttpConfig.UnauthorizedResultAction?.Invoke();
+                if (HttpConfig.UnauthorizedResultAsyncFunc != null)
+                    await HttpConfig.UnauthorizedResultAsyncFunc();
+            }
+        }
+
+        /// <summary>
         /// Handles logging based on defined LogScope
         /// </summary>
         /// <param name="response"></param>
@@ -221,6 +236,10 @@ namespace KGSoft.TinyHttpClient
                 await HttpConfig.PreRequestAuthAsyncFunc();
 
             var message = await HttpClientPool.Client.SendAsync(request, tkn);
+
+            // If we have any 401 actions defined, evaluate the result and fire them
+            await HandlePostRequestUnauthorizedActions(message.StatusCode);
+
             return message;
         }
 

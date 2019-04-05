@@ -48,5 +48,17 @@ namespace KGSoft.TinyHttpClient
         /// Can be used for acquiring OAuth tokens and adding them as Custom Headers
         /// </summary>
         public static Func<Task> PreRequestAuthAsyncFunc;
+
+        /// <summary>
+        /// An action to be performed when a 401 Unauthorized result is received.
+        /// Can be used to trigger token refresh/authentication flow automatically
+        /// </summary>
+        public static Action UnauthorizedResultAction;
+
+        /// <summary>
+        /// A function to be performed when a 401 Unauthorized result is received.
+        /// Can be used to trigger token refresh/authentication flow automatically
+        /// </summary>
+        public static Func<Task> UnauthorizedResultAsyncFunc;
     }
 }
