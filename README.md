@@ -9,11 +9,11 @@ This library was created out if necessity, as it contains code we seemed to be d
 * Logging capability
 * Global set and forget config (With the ability to manipulate headers on a request-by-request basis if needed)
 * Re-use of HttpClient (HttpClient pool functionality coming soon)
-* Pre-request async authentication (useful for ADAL requests where you need to get/refresh an ADAL token on every request)
+* Pre-request action and async func (useful for ADAL requests where you need to get/refresh an ADAL token on every request)
+* 401 Callback action and async func (useful for token expiry situations and triggering auth/refresh flow)
 
 ## Coming soon
 
-* 401 Callback action (Would be useful for token expiry situations)
 * Suggestions welcome!
 
 ## Nuget
