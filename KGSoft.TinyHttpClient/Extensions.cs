@@ -34,14 +34,12 @@ namespace KGSoft.TinyHttpClient
         /// <param name="message">The HttpResponseMessage we need to parse</param>
         /// <returns></returns>
         public static async Task<Response> BuildResponse(this HttpResponseMessage message)
-        {
-            return new Response()
+            => new Response()
             {
                 IsSuccess = message.IsSuccessStatusCode,
                 Message = await message.Content.ReadAsStringAsync(),
                 StatusCode = message.StatusCode
             };
-        }
 
         /// <summary>
         /// Converts a Response to a Response<T>
@@ -50,13 +48,11 @@ namespace KGSoft.TinyHttpClient
         /// <param name="response">The Response object we want to convert to Response<T></param>
         /// <returns></returns>
         public static Response<T> Convert<T>(this Response response)
-        {
-            return new Response<T>()
+            => new Response<T>()
             {
                 IsSuccess = response.IsSuccess,
                 Message = response.Message,
                 StatusCode = response.StatusCode
             };
-        }
     }
 }

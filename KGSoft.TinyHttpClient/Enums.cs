@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace KGSoft.TinyHttpClient
+﻿namespace KGSoft.TinyHttpClient
 {
     public class Enums
     {
