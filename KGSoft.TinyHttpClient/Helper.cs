@@ -18,9 +18,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> GetAsync(string url, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest(url, HttpMethod.Get, string.Empty, tkn, config);
-        }
+            => MakeHttpRequest(url, HttpMethod.Get, string.Empty, tkn, config);
 
         /// <summary>
         /// Create a GET request expecting T in the response
@@ -31,9 +29,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> GetAsync<T>(string url, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest<T>(url, HttpMethod.Get, string.Empty, tkn, config);
-        }
+            => MakeHttpRequest<T>(url, HttpMethod.Get, string.Empty, tkn, config);
         #endregion
 
         #region POST
@@ -46,9 +42,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> PostAsync(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest(url, HttpMethod.Post, body, tkn, config);
-        }
+            => MakeHttpRequest(url, HttpMethod.Post, body, tkn, config);
 
         /// <summary>
         /// Create a POST request expecting T in the response
@@ -60,9 +54,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> PostAsync<T>(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest<T>(url, HttpMethod.Post, body, tkn, config);
-        }
+            => MakeHttpRequest<T>(url, HttpMethod.Post, body, tkn, config);
         #endregion
 
         #region PUT
@@ -75,9 +67,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> PutAsync(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest(url, HttpMethod.Put, body, tkn, config);
-        }
+            => MakeHttpRequest(url, HttpMethod.Put, body, tkn, config);
 
         /// <summary>
         /// Create a PUT request expecting T in the response 
@@ -89,9 +79,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> PutAsync<T>(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest<T>(url, HttpMethod.Put, body, tkn, config);
-        }
+            => MakeHttpRequest<T>(url, HttpMethod.Put, body, tkn, config);
         #endregion
 
         #region DELETE
@@ -104,9 +92,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> DeleteAsync(string url, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest(url, HttpMethod.Delete, body, tkn, config);
-        }
+            => MakeHttpRequest(url, HttpMethod.Delete, body, tkn, config);
 
         /// <summary>
         /// Create a DELETE request expecting T in the response
@@ -117,9 +103,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> DeleteAsync<T>(string url, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-        {
-            return MakeHttpRequest<T>(url, HttpMethod.Delete, body, tkn, config);
-        }
+            => MakeHttpRequest<T>(url, HttpMethod.Delete, body, tkn, config);
         #endregion
 
         #region UtilMethods
