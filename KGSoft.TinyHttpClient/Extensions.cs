@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace KGSoft.TinyHttpClient
 {
-    static class Extensions
+    public static class Extensions
     {
         /// <summary>
         /// Builds a response of T from the HttpResponseMessage
@@ -37,6 +38,7 @@ namespace KGSoft.TinyHttpClient
             => new Response()
             {
                 IsSuccess = message.IsSuccessStatusCode,
+                Content = await message.Content.ReadAsByteArrayAsync(),
                 Message = await message.Content.ReadAsStringAsync(),
                 StatusCode = message.StatusCode
             };
@@ -51,8 +53,15 @@ namespace KGSoft.TinyHttpClient
             => new Response<T>()
             {
                 IsSuccess = response.IsSuccess,
+                Content = response.Content,
                 Message = response.Message,
                 StatusCode = response.StatusCode
             };
+
+        public static string EnsureDoesNotEndWith(this string value, string c)
+            => value.EndsWith(c) ? value.Substring(0, value.Length - c.Length) : value;
+
+        public static string TrimAndLower(this string value)
+            => value.Trim().ToLower();
     }
 }

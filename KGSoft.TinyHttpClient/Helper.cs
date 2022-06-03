@@ -117,7 +117,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="body"></param>
         /// <param name="tkn"></param>
         /// <returns></returns>
-        private static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
+        internal static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
         {
             var message = await GetResponseMessage(url, method, body, tkn, cfg);
             var response = await message.BuildResponse<T>();
@@ -135,7 +135,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="body"></param>
         /// <param name="tkn"></param>
         /// <returns></returns>
-        private static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
+        internal static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
         {
             var message = await GetResponseMessage(url, method, body, tkn, cfg);
             var response = await message.BuildResponse();
@@ -195,7 +195,7 @@ namespace KGSoft.TinyHttpClient
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(HttpConfig.MediaTypeHeader));
 
             LogHelper.LogMessage($"[{method.Method}]: {url}");
-
+            
             // Prepare the headers as per the config passed through
             if (cfg?.AuthHeader == null && HttpConfig.DefaultAuthHeader != null)
                 request.Headers.Authorization = HttpConfig.DefaultAuthHeader;
