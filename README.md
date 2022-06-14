@@ -1,7 +1,13 @@
-# KGSoft.TinyHttpClient
-A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs
 
-This library was created out if necessity, as it contains code we seemed to be duplicating throughout every Xamarin project we wrote. We have tried to encapsulate deserialization and the reading of HttpResponseMessages into this handy library.
+# KGSoft.TinyHttpClient
+A lightweight, highly compatible .NET library for simplifying the consumption of REST APIs (via both static client or Fluent API)
+
+This library was created out if necessity, as it contains code we seemed to be duplicating throughout every Xamarin project we wrote. We have tried to encapsulate deserialization and the reading of HttpResponseMessages into this handy library. It has since grown into a handy library for server-side API consumption as well, hence the newly added v2.x.x Fluent API feature.
+
+This library has two modes of use, each suited to different implementations. 
+**Mode 1 (Static Client)** is better suited to client-side (ie. mobile/desktop apps) where you have a single static context for headers / token refreshing etc. 
+**Mode 2 (Fluent API)** is better suited to server-side API consumption via the new Fluent API implementation.
+
 
 ## Features
 
@@ -10,11 +16,12 @@ This library was created out if necessity, as it contains code we seemed to be d
 * Global set and forget config (With the ability to manipulate headers on a request-by-request basis if needed)
 * Re-use of HttpClient (HttpClient pool functionality coming soon)
 * Pre-request action and async func (useful for ADAL requests where you need to get/refresh an ADAL token on every request)
-* 401 Callback action and async func (useful for token expiry situations and triggering auth/refresh flow)
+* 401 Callback action and async func (useful for token expiry situations and triggering auth/refresh flow in client-side apps)
+* **NEW: Fluent API for easy server-side use**
 
 ## Coming soon
 
-* Suggestions welcome!
+* Form-encoded param support
 
 ## Nuget
 https://www.nuget.org/packages/KGSoft.TinyHttpClient/
@@ -25,22 +32,40 @@ https://www.mr-kg.com/kgsoft-tinyhttpclient-a-smarter-way-to-consume-your-apis/
 ## Usage
 
 #### Simple GET request, expecting a response of T
-
+###### Mode 1 (Static Client ie. Mobile/Desktop Apps)
 
 `await Helper.GetAsync<SomeObject>("some http endpoint");`
+###### Mode 2 (Fluent API)
+
+    var response = await new HttpRequestBuilder()
+				                .Get("some http endpoint")
+				                .MakeRequestAsync<SomeObject>();
 
 #### Simple POST request, not expecting an object to be returned
 
-
+###### Mode 1 (Static Client ie. Mobile/Desktop Apps)
 `await Helper.PostAsync("some http endpoint", "{ some json object }");`
 
+###### Mode 2 (Fluent API)
+    var response = await new HttpRequestBuilder()
+                .Post("some http endpoint")
+                .AddBody(new data() { some object })
+                .MakeRequestAsync();
 
 #### Simple POST request, expecting a response of T
 
-
+###### Mode 1 (Static Client ie. Mobile/Desktop Apps)
 `await Helper.PostAsync<SomeObject>("some http endpoint", "{ some json object }");`
 
-#### Pre-request Token Acquisition/Refresh Using Microsoft.IdentityModel.Clients.ActiveDirectory
+###### Mode 2 (Fluent API)
+
+    var response = await new HttpRequestBuilder()
+                .Post("some http endpoint")
+                .AddBody(new data() { some object })
+                .MakeRequestAsync<SomeObject>();
+
+#### Mode 1 Special Features
+##### Pre-request Token Acquisition/Refresh Using Microsoft.IdentityModel.Clients.ActiveDirectory
 
 ```csharp
 /// <summary>
