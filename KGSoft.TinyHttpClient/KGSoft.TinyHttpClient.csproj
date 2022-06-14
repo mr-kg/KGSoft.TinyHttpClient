@@ -1,30 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0;netcoreapp3.1;netcoreapp2.1;netstandard2.0</TargetFrameworks>
-    <Authors>KGSoft</Authors>
-    <Product>TinyHttpClient</Product>
-    <PackageProjectUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</RepositoryUrl>
-    <PackageTags>httpclient, restclient, netstandard, http-client, rest-api, rest-client</PackageTags>
-    <PackageReleaseNotes>Update build targets</PackageReleaseNotes>
-    <PackageIconUrl></PackageIconUrl>
-    <Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
-    <Version>1.5.0</Version>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageIcon>icon_128x128.jpg</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+		<LangVersion>8.0</LangVersion>
+		<Authors>KGSoft</Authors>
+		<Product>TinyHttpClient</Product>
+		<PackageProjectUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</RepositoryUrl>
+		<PackageTags>httpclient, restclient, netstandard, http-client, rest-api, rest-client</PackageTags>
+		<PackageReleaseNotes>Added HttpRequestBuilder fluent API</PackageReleaseNotes>
+		<PackageIconUrl></PackageIconUrl>
+		<Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
+		<Version>2.0.0</Version>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageIcon>icon_128x128.jpg</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<AssemblyVersion>2.0.0.0</AssemblyVersion>
+		<FileVersion>2.0.0.0</FileVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\icon_128x128.jpg">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\icon_128x128.jpg">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

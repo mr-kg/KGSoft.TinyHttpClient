@@ -9,5 +9,6 @@
 /KGSoft.TinyHttpClient.Tests/obj/Debug
 /packages
 /KGSoft.TinyHttpClient/bin/Release
-/KGSoft.TinyHttpClient.Tests/bin/Release
-/KGSoft.TinyHttpClient.Tests/obj/Release
+/.vs/ProjectEvaluation
+/KGSoft.TinyHttpClient.Test/bin/Release/net5.0
+/KGSoft.TinyHttpClient.Test/obj
