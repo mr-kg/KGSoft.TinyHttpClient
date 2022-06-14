@@ -60,12 +60,17 @@ namespace KGSoft.TinyHttpClient
             return this;
         }
 
-        public HttpRequestBuilder AddFormParam(string name, string value)
-        {
-            if (!_requestParams.Any(x => x.Type == Enums.RequestParamType.FormEncoded && x.Key.TrimAndLower() == name.TrimAndLower()))
-                _requestParams.Add(new RequestParam(name, value, Enums.RequestParamType.FormEncoded));
-            return this;
-        }
+        /// <summary>
+        /// TODO: Implement form encoded values
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        //public HttpRequestBuilder AddFormParam(string name, string value)
+        //{
+        //    if (!_requestParams.Any(x => x.Type == Enums.RequestParamType.FormEncoded && x.Key.TrimAndLower() == name.TrimAndLower()))
+        //        _requestParams.Add(new RequestParam(name, value, Enums.RequestParamType.FormEncoded));
+        //    return this;
+        //}
 
         public HttpRequestBuilder AddCancellationToken(CancellationToken token)
         {
@@ -94,15 +99,23 @@ namespace KGSoft.TinyHttpClient
         public Task<Response> MakeRequestAsync()
         {
             Validate();
-
-            return Helper.MakeHttpRequest(BuildUrl(), _method, _body != null ? JsonConvert.SerializeObject(_body) : string.Empty, _cancellationToken, BuildHeaderConfig());
+            
+            return Helper.MakeHttpRequest(Utils.BuildUrl(_uri, _requestParams), 
+                _method, 
+                _body != null ? JsonConvert.SerializeObject(_body) : string.Empty, 
+                _cancellationToken,
+                Utils.BuildHeaderConfig(_headers));
         }
 
         public Task<Response<T>> MakeRequestAsync<T>()
         {
             Validate();
 
-            return Helper.MakeHttpRequest<T>(BuildUrl(), _method, _body != null ? JsonConvert.SerializeObject(_body) : string.Empty, _cancellationToken, BuildHeaderConfig());
+            return Helper.MakeHttpRequest<T>(Utils.BuildUrl(_uri, _requestParams), 
+                _method, 
+                _body != null ? JsonConvert.SerializeObject(_body) : string.Empty, 
+                _cancellationToken, 
+                Utils.BuildHeaderConfig(_headers));
         }
 
         private void Validate()
@@ -111,41 +124,6 @@ namespace KGSoft.TinyHttpClient
                 throw new MissingUriException();
             if (_method == null)
                 throw new MissingHttpMethodException();
-        }
-
-        private string BuildUrl()
-        {
-            if (!_requestParams.Any())
-                return _uri;
-
-            var sb = new StringBuilder();
-            sb.Append(_uri.EnsureDoesNotEndWith("/"));
-
-            foreach (var p in _requestParams)
-                sb.AppendFormat("{0}{1}={2}",
-                    p == _requestParams.First() ? "?" : "&",
-                    p.Key,
-                    p.Value);
-
-            return sb.ToString();
-        }
-
-        private HeaderConfig BuildHeaderConfig()
-        {
-            if (!_headers.Any())
-                return null;
-            else
-            {
-                var cfg = new HeaderConfig
-                {
-                    CustomHeaders = new Dictionary<string, string>()
-                };
-
-                foreach (var h in _headers)
-                    cfg.CustomHeaders.Add(h.Key, h.Value);
-
-                return cfg;
-            }
         }
     }
 }

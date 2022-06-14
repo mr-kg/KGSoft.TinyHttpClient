@@ -2,7 +2,7 @@
 
 namespace KGSoft.TinyHttpClient.Model
 {
-    internal class RequestParam
+    public class RequestParam
     {
         public RequestParam(string key, string value, RequestParamType type)
         {

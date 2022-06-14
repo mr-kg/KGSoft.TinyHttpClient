@@ -30,7 +30,7 @@ namespace KGSoft.TinyHttpClient.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(MissingUriException), "A userId of null was inappropriately allowed.")]
+        [ExpectedException(typeof(MissingUriException))]
         public async Task Test_GET_MissingUri()
         {
             var response = await new HttpRequestBuilder()
