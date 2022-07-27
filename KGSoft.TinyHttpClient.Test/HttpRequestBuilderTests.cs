@@ -39,6 +39,16 @@ namespace KGSoft.TinyHttpClient.Test
         }
 
         [TestMethod]
+        public async Task Test_GET_MismatchedType()
+        {
+            var response = await new HttpRequestBuilder()
+                .Get($"{ApiBase}api/users/2")
+                .MakeRequestAsync<MismatchedType>();
+
+            AssertResponseResult(response);
+        }
+
+        [TestMethod]
         public async Task Test_PUT()
         {
             var response = await new HttpRequestBuilder()
