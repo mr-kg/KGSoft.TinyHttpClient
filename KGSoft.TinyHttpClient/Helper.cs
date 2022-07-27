@@ -18,7 +18,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> GetAsync(string url, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest(url, HttpMethod.Get, string.Empty, tkn, config);
+            => MakeHttpRequest(url, HttpMethod.Get, string.Empty, tkn: tkn, cfg: config);
 
         /// <summary>
         /// Create a GET request expecting T in the response
@@ -29,7 +29,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> GetAsync<T>(string url, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest<T>(url, HttpMethod.Get, string.Empty, tkn, config);
+            => MakeHttpRequest<T>(url, HttpMethod.Get, string.Empty, tkn: tkn, cfg: config);
         #endregion
 
         #region POST
@@ -42,7 +42,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> PostAsync(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest(url, HttpMethod.Post, body, tkn, config);
+            => MakeHttpRequest(url, HttpMethod.Post, body, tkn: tkn, cfg: config);
 
         /// <summary>
         /// Create a POST request expecting T in the response
@@ -54,7 +54,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> PostAsync<T>(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest<T>(url, HttpMethod.Post, body, tkn, config);
+            => MakeHttpRequest<T>(url, HttpMethod.Post, body, tkn: tkn, cfg: config);
         #endregion
 
         #region PUT
@@ -67,7 +67,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> PutAsync(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest(url, HttpMethod.Put, body, tkn, config);
+            => MakeHttpRequest(url, HttpMethod.Put, body, tkn: tkn, cfg: config);
 
         /// <summary>
         /// Create a PUT request expecting T in the response 
@@ -79,7 +79,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> PutAsync<T>(string url, string body, CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest<T>(url, HttpMethod.Put, body, tkn, config);
+            => MakeHttpRequest<T>(url, HttpMethod.Put, body, tkn: tkn, cfg: config);
         #endregion
 
         #region DELETE
@@ -92,7 +92,7 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response> DeleteAsync(string url, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest(url, HttpMethod.Delete, body, tkn, config);
+            => MakeHttpRequest(url, HttpMethod.Delete, body, tkn: tkn, cfg: config);
 
         /// <summary>
         /// Create a DELETE request expecting T in the response
@@ -103,23 +103,28 @@ namespace KGSoft.TinyHttpClient
         /// <param name="config">Configuration unique to this request. Used to override what is defined in HttpConfig</param>
         /// <returns></returns>
         public static Task<Response<T>> DeleteAsync<T>(string url, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig config = default(HeaderConfig))
-            => MakeHttpRequest<T>(url, HttpMethod.Delete, body, tkn, config);
+            => MakeHttpRequest<T>(url, HttpMethod.Delete, body, tkn: tkn, cfg: config);
         #endregion
 
         #region UtilMethods
+
         /// <summary>
-        /// A Generic version of MakeHttpRequest.
-        /// Used when we are expecing and actual type to come as a response that we need to deserialize
+        /// A generic version of MakeHttpRequest
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url">The URL we want to make the request to</param>
-        /// <param name="method"></param>
-        /// <param name="body"></param>
-        /// <param name="tkn"></param>
+        /// <typeparam name="T">Expected response type</typeparam>
+        /// <param name="url">Url to which the request is made</param>
+        /// <param name="method">HttpMethod</param>
+        /// <param name="body">Desired body</param>
+        /// <param name="content">Desired content</param>
+        /// <param name="tkn">Cancellation token for request</param>
+        /// <param name="cfg">Additional config</param>
         /// <returns></returns>
-        internal static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
+        internal static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", HttpContent content = null, CancellationToken tkn = default, HeaderConfig cfg = default)
         {
-            var message = await GetResponseMessage(url, method, body, tkn, cfg);
+            var message = content == null 
+                ? await GetResponseMessage(url, method, body, tkn, cfg)
+                : await GetResponseMessage(url, method, content, tkn, cfg);
+
             var response = await message.BuildResponse<T>();
 
             HandleLogging(response);
@@ -128,16 +133,21 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
-        /// An HttpRequest with a hollow response. Used for things like Http.Delete where we do not expect to deserialize anything
+        /// Makes an HttpRequest without expecting a response type
         /// </summary>
-        /// <param name="url">The URL we want to make the request to</param>
-        /// <param name="method"></param>
-        /// <param name="body"></param>
-        /// <param name="tkn"></param>
+        /// <param name="url">Url to which the request is made</param>
+        /// <param name="method">HttpMethod</param>
+        /// <param name="body">Desired body</param>
+        /// <param name="content">Desired content</param>
+        /// <param name="tkn">Cancellation token for request</param>
+        /// <param name="cfg">Additional config</param>
         /// <returns></returns>
-        internal static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
+        internal static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", HttpContent content = null, CancellationToken tkn = default, HeaderConfig cfg = default)
         {
-            var message = await GetResponseMessage(url, method, body, tkn, cfg);
+            var message = content == null
+                ? await GetResponseMessage(url, method, body, tkn, cfg)
+                : await GetResponseMessage(url, method, content, tkn, cfg);
+
             var response = await message.BuildResponse();
 
             HandleLogging(response);
@@ -182,20 +192,33 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
-        /// Create and send an HttpRequestMessage
+        /// Create and send an HttpRequestMessage with a string body
         /// </summary>
-        /// <param name="url">The URL we want to make the request to</param>
+        /// <param name="url"></param>
         /// <param name="method"></param>
         /// <param name="body"></param>
         /// <param name="tkn"></param>
+        /// <param name="cfg"></param>
         /// <returns></returns>
-        private static async Task<HttpResponseMessage> GetResponseMessage(string url, HttpMethod method, string body = "", CancellationToken tkn = default(CancellationToken), HeaderConfig cfg = default(HeaderConfig))
+        private static Task<HttpResponseMessage> GetResponseMessage(string url, HttpMethod method, string body = "", CancellationToken tkn = default, HeaderConfig cfg = default)
+            => GetResponseMessage(url, method, CreateContent(body), tkn, cfg);
+
+        /// <summary>
+        /// Create and send an HttpRequestMessage with HttpContent
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="method"></param>
+        /// <param name="content"></param>
+        /// <param name="tkn"></param>
+        /// <param name="cfg"></param>
+        /// <returns></returns>
+        private static async Task<HttpResponseMessage> GetResponseMessage(string url, HttpMethod method, HttpContent content = null, CancellationToken tkn = default, HeaderConfig cfg = default)
         {
             HttpRequestMessage request = new HttpRequestMessage(method, url);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(HttpConfig.MediaTypeHeader));
 
             LogHelper.LogMessage($"[{method.Method}]: {url}");
-            
+
             // Prepare the headers as per the config passed through
             if (cfg?.AuthHeader == null && HttpConfig.DefaultAuthHeader != null)
                 request.Headers.Authorization = HttpConfig.DefaultAuthHeader;
@@ -210,10 +233,10 @@ namespace KGSoft.TinyHttpClient
                 foreach (var kvp in cfg.CustomHeaders)
                     request.Headers.Add(kvp.Key, kvp.Value);
 
-            // Prepare the body
-            if (!string.IsNullOrEmpty(body))
-                request.Content = CreateContent(body);
-            
+            // Prepare the content
+            if (content != null)
+                request.Content = content;
+
             // Fire any pre-auth delegates before sending the request
             HttpConfig.PreRequestAuthAction?.Invoke();
             if (HttpConfig.PreRequestAuthAsyncFunc != null)
