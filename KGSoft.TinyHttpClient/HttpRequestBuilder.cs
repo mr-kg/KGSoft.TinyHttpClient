@@ -93,7 +93,7 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
-        /// Adds a parameter to be added to the query string
+        /// Adds a Query String parameter to the request
         /// </summary>
         /// <param name="name">Key for the parameter</param>
         /// <param name="value">Value for the parameter</param>
@@ -106,7 +106,7 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
-        /// Adds a range of query string parameters
+        /// Adds a range of query string parameters to the request
         /// </summary>
         /// <param name="keyValuePairs">The dictionaly of parameters to be added</param>
         /// <returns>HttpRequestBuilder</returns>
@@ -119,7 +119,7 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
-        /// Adds a parameter to be added to the query string (form encoded)
+        /// Adds a Form Encoded parameter to the request
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
