@@ -12,3 +12,4 @@
 /.vs/ProjectEvaluation
 /KGSoft.TinyHttpClient.Test/bin/Release/net5.0
 /KGSoft.TinyHttpClient.Test/obj
+/KGSoft.TinyHttpClient.Test/bin/Debug/net5.0

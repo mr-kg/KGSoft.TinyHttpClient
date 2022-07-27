@@ -18,6 +18,11 @@ namespace KGSoft.TinyHttpClient
         private HttpMethod _method;
         private object _body;
         private CancellationToken _cancellationToken;
+        private HttpContent _content;
+
+        private bool HasFormParams => _requestParams.Any(x => x.Type == Enums.RequestParamType.FormEncoded);
+        private IEnumerable<RequestParam> FormParams => _requestParams.Where(x => x.Type == Enums.RequestParamType.FormEncoded);
+        private IEnumerable<RequestParam> QueryParams => _requestParams.Where(x => x.Type == Enums.RequestParamType.QueryString);
 
         /// <summary>
         /// Default ctor for the Request Builder
@@ -77,6 +82,17 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
+        /// Adds HttpContent to the request
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public HttpRequestBuilder AddContent(HttpContent content)
+        {
+            _content = content;
+            return this;
+        }
+
+        /// <summary>
         /// Adds a parameter to be added to the query string
         /// </summary>
         /// <param name="name">Key for the parameter</param>
@@ -103,16 +119,16 @@ namespace KGSoft.TinyHttpClient
         }
 
         /// <summary>
-        /// TODO: Implement form encoded values
+        /// Adds a parameter to be added to the query string (form encoded)
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        //public HttpRequestBuilder AddFormParam(string name, string value)
-        //{
-        //    if (!_requestParams.Any(x => x.Type == Enums.RequestParamType.FormEncoded && x.Key.TrimAndLower() == name.TrimAndLower()))
-        //        _requestParams.Add(new RequestParam(name, value, Enums.RequestParamType.FormEncoded));
-        //    return this;
-        //}
+        public HttpRequestBuilder AddFormParam(string name, string value)
+        {
+            if (!_requestParams.Any(x => x.Type == Enums.RequestParamType.FormEncoded && x.Key.TrimAndLower() == name.TrimAndLower()))
+                _requestParams.Add(new RequestParam(name, value, Enums.RequestParamType.FormEncoded));
+            return this;
+        }
 
 
         /// <summary>
@@ -170,7 +186,8 @@ namespace KGSoft.TinyHttpClient
             
             return Helper.MakeHttpRequest(Utils.BuildUrl(_uri, _requestParams), 
                 _method, 
-                _body != null ? JsonConvert.SerializeObject(_body) : string.Empty, 
+                _body != null ? JsonConvert.SerializeObject(_body) : string.Empty,
+                BuildContent(),
                 _cancellationToken,
                 Utils.BuildHeaderConfig(_headers));
         }
@@ -183,9 +200,10 @@ namespace KGSoft.TinyHttpClient
         {
             Validate();
 
-            return Helper.MakeHttpRequest<T>(Utils.BuildUrl(_uri, _requestParams), 
+            return Helper.MakeHttpRequest<T>(Utils.BuildUrl(_uri, QueryParams), 
                 _method, 
-                _body != null ? JsonConvert.SerializeObject(_body) : string.Empty, 
+                _body != null ? JsonConvert.SerializeObject(_body) : string.Empty,
+                BuildContent(),
                 _cancellationToken, 
                 Utils.BuildHeaderConfig(_headers));
         }
@@ -196,6 +214,18 @@ namespace KGSoft.TinyHttpClient
                 throw new MissingUriException();
             if (_method == null)
                 throw new MissingHttpMethodException();
+            if (_content != null && HasFormParams)
+                throw new ConflictingContentException();
+        }
+
+        private HttpContent BuildContent()
+        {
+            if (_content != null)
+                return _content;
+            else if (HasFormParams)
+                return new FormUrlEncodedContent(FormParams.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)));
+
+            return null;
         }
     }
 }

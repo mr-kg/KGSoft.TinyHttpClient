@@ -7,7 +7,7 @@ namespace KGSoft.TinyHttpClient
 {
     public static class Utils
     {
-        public static string BuildUrl(string baseUrl, List<RequestParam> requestParams = null)
+        public static string BuildUrl(string baseUrl, IEnumerable<RequestParam> requestParams = null)
         {
             if (requestParams == null || !requestParams.Any())
                 return baseUrl;
