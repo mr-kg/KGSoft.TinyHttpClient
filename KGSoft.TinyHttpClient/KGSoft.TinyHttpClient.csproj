@@ -11,7 +11,7 @@
     <PackageIconUrl>
     </PackageIconUrl>
     <Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageIcon>icon_128x128.jpg</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
