@@ -1,11 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KGSoft.TinyHttpClient", "KGSoft.TinyHttpClient\KGSoft.TinyHttpClient.csproj", "{4588C7A1-3366-47C2-B7FD-20BA8A78AAB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KGSoft.TinyHttpClient.Test", "KGSoft.TinyHttpClient.Test\KGSoft.TinyHttpClient.Test.csproj", "{D66510EB-C1AC-4413-85DF-28FD1167964A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KGSoft.TinyHttpClient.Test", "KGSoft.TinyHttpClient.Test\KGSoft.TinyHttpClient.Test.csproj", "{D66510EB-C1AC-4413-85DF-28FD1167964A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
