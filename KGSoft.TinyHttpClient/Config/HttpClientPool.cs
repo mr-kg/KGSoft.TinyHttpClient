@@ -1,16 +1,27 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 
 namespace KGSoft.TinyHttpClient.Config;
 
-static class HttpClientPool
+public static class HttpClientPool
 {
-    static HttpClient _httpClient;
+    private static readonly Lazy<HttpClient> _lazyHttpClient = new(CreateHttpClient);
 
-    public static HttpClient Client
+    public static HttpClient Client => _lazyHttpClient.Value;
+
+    private static HttpClient CreateHttpClient()
     {
-        get
+        var handler = new SocketsHttpHandler
         {
-            return _httpClient ??= new HttpClient();
-        }
+            PooledConnectionLifetime = TimeSpan.FromMinutes(HttpConfig.HttpClientPoolLifetimeMinutes), // Ensures DNS changes are respected
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(HttpConfig.HttpClientPoolIdleMinutes), // Closes idle connections after a timeout
+        };
+
+        var client = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromSeconds(HttpConfig.RequestTimeoutSeconds) // Example timeout
+        };
+
+        return client;
     }
 }

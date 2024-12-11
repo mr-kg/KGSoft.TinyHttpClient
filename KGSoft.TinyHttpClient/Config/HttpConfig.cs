@@ -60,4 +60,19 @@ public static class HttpConfig
     /// Can be used to trigger token refresh/authentication flow automatically
     /// </summary>
     public static Func<Task> UnauthorizedResultAsyncFunc;
+
+    /// <summary>
+    /// Lifetime of HttpClient
+    /// </summary>
+    public static int HttpClientPoolLifetimeMinutes = 5;
+
+    /// <summary>
+    /// Idle timeout for the HttpClient
+    /// </summary>
+    public static int HttpClientPoolIdleMinutes = 2;
+
+    /// <summary>
+    /// Request timeout for Http Requests
+    /// </summary>
+    public static int RequestTimeoutSeconds = 100;
 }
