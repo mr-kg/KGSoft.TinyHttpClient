@@ -1,9 +1,14 @@
-﻿namespace KGSoft.TinyHttpClient.Tests.Model
+﻿using Newtonsoft.Json;
+
+namespace KGSoft.TinyHttpClient.Test.Model;
+
+internal class Data
 {
-    public class data
-    {
-        public int id { get; set; }
-        public string first_name { get; set; }
-        public string last_name { get; set; }
-    }
+    public int Id { get; set; }
+
+    [JsonProperty("first_name")]
+    public string FirstName { get; set; }
+
+    [JsonProperty("last_name")]
+    public string LastName { get; set; }
 }

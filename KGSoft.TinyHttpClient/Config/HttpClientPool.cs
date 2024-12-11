@@ -1,21 +1,16 @@
 ﻿using System.Net.Http;
 
-namespace KGSoft.TinyHttpClient.Config
-{
-    static class HttpClientPool
-    {
-        static HttpClient _httpClient;
+namespace KGSoft.TinyHttpClient.Config;
 
-        public static HttpClient Client
+static class HttpClientPool
+{
+    static HttpClient _httpClient;
+
+    public static HttpClient Client
+    {
+        get
         {
-            get
-            {
-                if (_httpClient == null)
-                {
-                    _httpClient = new HttpClient();
-                }
-                return _httpClient;
-            }
+            return _httpClient ??= new HttpClient();
         }
     }
 }

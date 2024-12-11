@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace KGSoft.TinyHttpClient.Logging
+namespace KGSoft.TinyHttpClient.Logging;
+
+public interface ILogger
 {
-    public interface ILogger
-    {
-        void LogMessage(string message);
-        void LogException(Exception ex);
-    }
+    void LogMessage(string message);
+    void LogException(Exception ex);
 }

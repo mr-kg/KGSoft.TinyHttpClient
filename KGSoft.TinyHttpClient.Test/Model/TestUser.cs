@@ -1,7 +1,6 @@
-﻿namespace KGSoft.TinyHttpClient.Tests.Model
+﻿namespace KGSoft.TinyHttpClient.Test.Model;
+
+internal class TestUser
 {
-    public class TestUser
-    {
-        public data data { get; set; }
-    }
+    public Data data { get; set; }
 }
