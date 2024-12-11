@@ -1,22 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <Authors>KGSoft</Authors>
     <Product>TinyHttpClient</Product>
     <PackageProjectUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mr-kg/KGSoft.TinyHttpClient</RepositoryUrl>
     <PackageTags>httpclient, restclient, netstandard, http-client, rest-api, rest-client</PackageTags>
-    <PackageReleaseNotes>Added HttpRequestBuilder fluent API</PackageReleaseNotes>
+    <PackageReleaseNotes>Target .NET 8</PackageReleaseNotes>
     <PackageIconUrl>
     </PackageIconUrl>
-    <Description>A lightweight, highly compatible .NET Standard library for simplifying the consumption of REST APIs</Description>
-    <Version>2.2.0</Version>
+    <Description>A lightweight, highly compatible .NET library for simplifying the consumption of REST APIs</Description>
+    <Version>2.3.0</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageIcon>icon_128x128.jpg</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>2.2.0.0</AssemblyVersion>
-    <FileVersion>2.2.0.0</FileVersion>
+    <AssemblyVersion>2.3.0.0</AssemblyVersion>
+    <FileVersion>2.3.0.0</FileVersion>
+    <Title>KGSoft.TinyHttpClient</Title>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\icon_128x128.jpg">
