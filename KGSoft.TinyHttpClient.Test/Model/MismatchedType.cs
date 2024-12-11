@@ -1,8 +1,7 @@
-﻿namespace KGSoft.TinyHttpClient.Tests.Model
+﻿namespace KGSoft.TinyHttpClient.Test.Model;
+
+internal class MismatchedType
 {
-    internal class MismatchedType
-    {
-        public int X { get; set; }
-        public string Y { get; set; }
-    }
+    public int X { get; set; }
+    public string Y { get; set; }
 }
