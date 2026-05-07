@@ -1,109 +1,290 @@
-
 # KGSoft.TinyHttpClient
-A lightweight, highly compatible .NET library for simplifying the consumption of REST APIs (via both static client or Fluent API)
 
-This library was created out if necessity, as it contains code we seemed to be duplicating throughout every Xamarin project we wrote. We have tried to encapsulate deserialization and the reading of HttpResponseMessages into this handy library. It has since grown into a handy library for server-side API consumption as well, hence the newly added v2.x.x Fluent API feature.
+A lightweight .NET HTTP utility for consuming REST APIs with either a simple static helper API or a fluent request builder.
 
-This library has two modes of use, each suited to different implementations. 
-**Mode 1 (Static Client)** is better suited to client-side (ie. mobile/desktop apps) where you have a single static context for headers / token refreshing etc. 
-**Mode 2 (Fluent API)** is better suited to server-side API consumption via the new Fluent API implementation.
+KGSoft.TinyHttpClient wraps common `HttpClient` tasks such as sending requests, applying headers, reading response content, deserializing JSON, handling typed responses, logging, and running authentication callbacks.
 
+> Targets .NET 10.
+
+## Installation
+
+Install from NuGet:
+
+```bash
+dotnet add package KGSoft.TinyHttpClient
+```
+
+NuGet package:
+
+https://www.nuget.org/packages/KGSoft.TinyHttpClient/
 
 ## Features
 
-* Encapsulation of types expected from an HttpRequest (Request and Request of T)
-* Logging capability
-* Global set and forget config (With the ability to manipulate headers on a request-by-request basis if needed)
-* Re-use of HttpClient (HttpClient pool functionality coming soon)
-* Pre-request action and async func (useful for ADAL requests where you need to get/refresh an ADAL token on every request)
-* 401 Callback action and async func (useful for token expiry situations and triggering auth/refresh flow in client-side apps)
-* **NEW: Fluent API for easy server-side use**
+- Static helper API for quick requests
+- Fluent request builder for readable request composition
+- Typed responses via `Response<T>`
+- Automatic JSON deserialization
+- Raw response body access as both `string` and `byte[]`
+- Query string support with URL encoding
+- JSON request body support
+- Form-encoded request support
+- Custom `HttpContent` support
+- Global and per-request header configuration
+- Reused `HttpClient` with configurable pooled connection lifetime, idle timeout, and request timeout
+- Logging support
+- Pre-request sync/async hooks for token acquisition or refresh
+- 401 sync/async callbacks for authentication expiry flows
 
-## Coming soon
+## Basic Usage
 
-* Form-encoded param support
+### Static Helper API
 
-## Nuget
-https://www.nuget.org/packages/KGSoft.TinyHttpClient/
-
-## Further Reading
-https://www.mr-kg.com/kgsoft-tinyhttpclient-a-smarter-way-to-consume-your-apis/
-
-## Usage
-
-#### Simple GET request, expecting a response of T
-###### Mode 1 (Static Client ie. Mobile/Desktop Apps)
-
-`await Helper.GetAsync<SomeObject>("some http endpoint");`
-###### Mode 2 (Fluent API)
-
-    var response = await new HttpRequestBuilder()
-				                .Get("some http endpoint")
-				                .MakeRequestAsync<SomeObject>();
-
-#### Simple POST request, not expecting an object to be returned
-
-###### Mode 1 (Static Client ie. Mobile/Desktop Apps)
-`await Helper.PostAsync("some http endpoint", "{ some json object }");`
-
-###### Mode 2 (Fluent API)
-    var response = await new HttpRequestBuilder()
-                .Post("some http endpoint")
-                .AddBody(new data() { some object })
-                .MakeRequestAsync();
-
-#### Simple POST request, expecting a response of T
-
-###### Mode 1 (Static Client ie. Mobile/Desktop Apps)
-`await Helper.PostAsync<SomeObject>("some http endpoint", "{ some json object }");`
-
-###### Mode 2 (Fluent API)
-
-    var response = await new HttpRequestBuilder()
-                .Post("some http endpoint")
-                .AddBody(new data() { some object })
-                .MakeRequestAsync<SomeObject>();
-
-#### Mode 1 Special Features
-##### Pre-request Token Acquisition/Refresh Using Microsoft.IdentityModel.Clients.ActiveDirectory
+Use the `Helper` class when you want concise one-line HTTP calls.
 
 ```csharp
-/// <summary>
-/// Our method to get and set our ADAL AccessToken
-/// </summary>
-/// <returns></returns>
-private async Task GetAuthBearerToken()
+var response = await Helper.GetAsync("https://example.com/api/users/1");
+
+if (response.IsSuccess)
 {
-    var authority = "";
-    var resource = "";
-    var clientId = "";
-    var redirectUri = "";
-    var extraQueryParams = "";
-
-    var authContext = new AuthenticationContext(authority);
-    PlatformParameters platform = new PlatformParameters(PromptBehavior.Auto);
-
-    // Call to the ADAL to get a token
-    var result = await authContext.AcquireTokenAsync(
-         resource,
-         clientId,
-         new Uri(redirectUri),
-         platform,
-         UserIdentifier.AnyUser,
-         extraQueryParams);
-
-    if (result != null) // We get a token, and we set it as the AuthHeader for our HttpClient in the global config
-        HttpConfig.DefaultAuthHeader = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", result.AccessToken);
-}
-
-
-[TestMethod]
-public async Task Test_PreAuth()
-{
-    // Set the PreRequestAuth Function here and forget about it
-    HttpConfig.PreRequestAuthAsyncFunc = GetAuthBearerToken;
-    var response = await Helper.GetAsync("some protected API");
+    Console.WriteLine(response.Message);
 }
 ```
 
-#### For more examples, please consult the unit test project included in the repo
+### Typed GET Request
+
+```csharp
+var response = await Helper.GetAsync<User>("https://example.com/api/users/1");
+
+if (response.IsSuccess)
+{
+    User user = response.Result;
+}
+```
+
+### POST Request
+
+```csharp
+var body = JsonConvert.SerializeObject(new
+{
+    first_name = "Jane",
+    last_name = "Doe"
+});
+
+var response = await Helper.PostAsync("https://example.com/api/users", body);
+```
+
+### Typed POST Request
+
+```csharp
+var body = JsonConvert.SerializeObject(new
+{
+    first_name = "Jane",
+    last_name = "Doe"
+});
+
+var response = await Helper.PostAsync<User>("https://example.com/api/users", body);
+
+if (response.IsSuccess)
+{
+    User user = response.Result;
+}
+```
+
+## Fluent API
+
+Use `HttpRequestBuilder` when you want requests to read naturally and compose options per request.
+
+### GET
+
+```csharp
+var response = await new HttpRequestBuilder()
+    .Get("https://example.com/api/users/1")
+    .MakeRequestAsync<User>();
+```
+
+### Query Parameters
+
+```csharp
+var response = await new HttpRequestBuilder()
+    .Get("https://example.com/api/users")
+    .AddQueryParam("page", "1")
+    .AddQueryParam("search", "jane doe")
+    .MakeRequestAsync<UserSearchResult>();
+```
+
+### POST JSON Body
+
+```csharp
+var response = await new HttpRequestBuilder()
+    .Post("https://example.com/api/users")
+    .AddBody(new
+    {
+        first_name = "Jane",
+        last_name = "Doe"
+    })
+    .MakeRequestAsync<User>();
+```
+
+### Form-Encoded Request
+
+```csharp
+var response = await new HttpRequestBuilder()
+    .Post("https://example.com/oauth/token")
+    .AddFormParam("grant_type", "client_credentials")
+    .AddFormParam("client_id", "my-client-id")
+    .AddFormParam("client_secret", "my-client-secret")
+    .MakeRequestAsync<TokenResponse>();
+```
+
+### Custom Headers
+
+```csharp
+var response = await new HttpRequestBuilder()
+    .Get("https://example.com/api/users/1")
+    .AddHeader("X-Correlation-ID", correlationId)
+    .AddAuthorizationHeader("Bearer your-access-token")
+    .MakeRequestAsync<User>();
+```
+
+### Cancellation Token
+
+```csharp
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+var response = await new HttpRequestBuilder()
+    .Get("https://example.com/api/users/1")
+    .AddCancellationToken(cts.Token)
+    .MakeRequestAsync<User>();
+```
+
+## Responses
+
+Requests return either `Response` or `Response<T>`.
+
+```csharp
+public class Response
+{
+    public HttpStatusCode StatusCode { get; set; }
+    public bool IsSuccess { get; set; }
+    public string Message { get; set; }
+    public byte[] Content { get; set; }
+}
+
+public class Response<T> : Response
+{
+    public T Result { get; set; }
+}
+```
+
+`Message` contains the response body as a string.
+
+`Content` contains the response body as bytes.
+
+`Result` contains the deserialized response body when using `Response<T>`.
+
+## Global Configuration
+
+`HttpConfig` can be used to configure defaults shared by requests.
+
+```csharp
+HttpConfig.MediaTypeHeader = Constants.ApplicationJson;
+HttpConfig.RequestTimeoutSeconds = 100;
+HttpConfig.HttpClientPoolLifetimeMinutes = 5;
+HttpConfig.HttpClientPoolIdleMinutes = 2;
+```
+
+### Default Authorization Header
+
+```csharp
+HttpConfig.DefaultAuthHeader =
+    new AuthenticationHeaderValue("Bearer", accessToken);
+```
+
+### Global Custom Headers
+
+```csharp
+HttpConfig.CustomHeaders["X-App-Version"] = "1.0.0";
+```
+
+### Per-Request Header Configuration
+
+```csharp
+var config = new HeaderConfig
+{
+    AuthHeader = new AuthenticationHeaderValue("Bearer", accessToken),
+    CustomHeaders = new Dictionary<string, string>
+    {
+        { "X-Correlation-ID", correlationId }
+    }
+};
+
+var response = await Helper.GetAsync<User>(
+    "https://example.com/api/users/1",
+    config: config);
+```
+
+## Authentication Hooks
+
+You can run logic before each request. This is useful for acquiring or refreshing tokens.
+
+```csharp
+HttpConfig.PreRequestAuthAsyncFunc = async () =>
+{
+    var accessToken = await tokenProvider.GetAccessTokenAsync();
+
+    HttpConfig.DefaultAuthHeader =
+        new AuthenticationHeaderValue("Bearer", accessToken);
+};
+```
+
+The hook runs before request headers are applied, so changes made inside the hook affect the current request.
+
+## 401 Callbacks
+
+You can register callbacks that run when a response returns `401 Unauthorized`.
+
+```csharp
+HttpConfig.UnauthorizedResultAction = () =>
+{
+    Console.WriteLine("Unauthorized response received.");
+};
+```
+
+Or use an async callback:
+
+```csharp
+HttpConfig.UnauthorizedResultAsyncFunc = async () =>
+{
+    await authService.RefreshSignInAsync();
+};
+```
+
+## Logging
+
+Implement `ILogger` and assign it to `HttpConfig.Logger`.
+
+```csharp
+public class ConsoleLogger : ILogger
+{
+    public void Log(string message)
+    {
+        Console.WriteLine(message);
+    }
+}
+
+HttpConfig.Logger = new ConsoleLogger();
+HttpConfig.LogScope = Enums.LogScope.AllRequests;
+```
+
+Supported log scopes:
+
+```csharp
+Enums.LogScope.OnlyFailedRequests
+Enums.LogScope.AllRequests
+```
+
+## Notes
+
+KGSoft.TinyHttpClient intentionally keeps the API small. It is useful when you want a lightweight wrapper around `HttpClient` without adopting a larger REST client framework.
+
+For more examples, see the test project in this repository.
