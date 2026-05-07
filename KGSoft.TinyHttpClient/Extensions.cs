@@ -17,7 +17,9 @@ public static class Extensions
         var r = await message.BuildResponse();
         var response = r.Convert<T>();
 
-        if (typeof(T) != typeof(string))
+        if (typeof(T) == typeof(string))
+            response.Result = (T)(object)response.Message;
+        else
         {
             if (HttpConfig.MediaTypeHeader == Constants.ApplicationJson)
                 response.Result = response.Message.TryDeserializeFromJson<T>();

@@ -30,12 +30,19 @@ public class HttpRequestBuilderTests : TestBase
     }
 
     [TestMethod]
-    [ExpectedException(typeof(MissingUriException))]
     public async Task Test_GET_MissingUri()
     {
-        var response = await new HttpRequestBuilder()
-            .Get(string.Empty)
-            .MakeRequestAsync();
+        try
+        {
+            await new HttpRequestBuilder()
+                .Get(string.Empty)
+                .MakeRequestAsync();
+
+            Assert.Fail($"{nameof(MissingUriException)} was not thrown.");
+        }
+        catch (MissingUriException)
+        {
+        }
     }
 
     [TestMethod]

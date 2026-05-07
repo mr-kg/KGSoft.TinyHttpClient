@@ -1,0 +1,73 @@
+name: Publish NuGet
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_PATH: KGSoft.TinyHttpClient/KGSoft.TinyHttpClient.csproj
+      TEST_PROJECT_PATH: KGSoft.TinyHttpClient.Test/KGSoft.TinyHttpClient.Test.csproj
+      PACKAGE_OUTPUT: artifacts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag is on master
+        shell: bash
+        run: |
+          git fetch origin master
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/master
+
+      - name: Get version from tag
+        id: version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Tag must look like v1.2.3 or v1.2.3-preview.1"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore "$TEST_PROJECT_PATH"
+
+      - name: Build
+        run: dotnet build "$TEST_PROJECT_PATH" --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test "$TEST_PROJECT_PATH" --configuration Release --no-build --verbosity normal
+
+      - name: Pack
+        run: >
+          dotnet pack "$PROJECT_PATH"
+          --configuration Release
+          --no-build
+          --output "$PACKAGE_OUTPUT"
+          -p:PackageVersion=${{ steps.version.outputs.version }}
+          -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Publish
+        run: >
+          dotnet nuget push "$PACKAGE_OUTPUT"/*.nupkg
+          --api-key "$NUGET_API_KEY"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

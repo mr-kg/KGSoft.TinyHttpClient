@@ -182,7 +182,7 @@ public class HttpRequestBuilder
     {
         Validate();
         
-        return Helper.MakeHttpRequest(Utils.BuildUrl(_uri, _requestParams), 
+        return Helper.MakeHttpRequest(Utils.BuildUrl(_uri, QueryParams), 
             _method, 
             _body != null ? JsonConvert.SerializeObject(_body) : string.Empty,
             BuildContent(),
