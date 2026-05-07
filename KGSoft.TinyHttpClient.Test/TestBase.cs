@@ -6,8 +6,11 @@ namespace KGSoft.TinyHttpClient.Test;
 
 public class TestBase
 {
-    public const string ApiBase = "https://reqres.in/";
-    public const string ApiUnauthorized = "https://httpstat.us/401";
+    private static readonly TestHttpServer _server = new();
+
+    public static string ApiBase => _server.BaseUrl;
+    public static string ApiUnauthorized => $"{ApiBase}unauthorized";
+
     internal static readonly AuthenticationHeaderValue AuthHeader = new("Bearer", "XYZ");
     internal static readonly Dictionary<string, string> CustomHeaders = new() { { "CustomKey", "CustomValue" } };
 

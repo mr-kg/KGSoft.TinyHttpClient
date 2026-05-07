@@ -219,6 +219,11 @@ public static class Helper
 
         LogHelper.LogMessage($"[{method.Method}]: {url}");
 
+        // Fire any pre-auth delegates before applying headers so mutations affect this request.
+        HttpConfig.PreRequestAuthAction?.Invoke();
+        if (HttpConfig.PreRequestAuthAsyncFunc != null)
+            await HttpConfig.PreRequestAuthAsyncFunc();
+
         // Prepare the headers as per the config passed through
         if (cfg?.AuthHeader == null && HttpConfig.DefaultAuthHeader != null)
             request.Headers.Authorization = HttpConfig.DefaultAuthHeader;
@@ -236,11 +241,6 @@ public static class Helper
         // Prepare the content
         if (content != null)
             request.Content = content;
-
-        // Fire any pre-auth delegates before sending the request
-        HttpConfig.PreRequestAuthAction?.Invoke();
-        if (HttpConfig.PreRequestAuthAsyncFunc != null)
-            await HttpConfig.PreRequestAuthAsyncFunc();
 
         var message = await HttpClientPool.Client.SendAsync(request, tkn);
 

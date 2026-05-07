@@ -1,7 +1,8 @@
-﻿using KGSoft.TinyHttpClient.Model;
+using KGSoft.TinyHttpClient.Model;
 using KGSoft.TinyHttpClient.Test.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,7 +57,9 @@ public class GeneralTests : TestBase
         {
             new RequestParam("woo", "hoo", Enums.RequestParamType.QueryString)
         };
+
         var r = Utils.BuildUrl(baseUrl, param);
+
         Assert.AreEqual(urlExpected, r);
     }
 
@@ -70,7 +73,82 @@ public class GeneralTests : TestBase
             new("woo", "hoo", Enums.RequestParamType.QueryString),
             new("foo", "bar", Enums.RequestParamType.QueryString)
         };
+
         var r = Utils.BuildUrl(baseUrl, param);
+
         Assert.AreEqual(urlExpected, r);
+    }
+
+    [TestMethod]
+    public void Test_Url_Creation_Existing_Query()
+    {
+        var baseUrl = "https://google.com/search?existing=true";
+        var urlExpected = "https://google.com/search?existing=true&woo=hoo";
+        var param = new List<RequestParam>
+        {
+            new("woo", "hoo", Enums.RequestParamType.QueryString)
+        };
+
+        var r = Utils.BuildUrl(baseUrl, param);
+
+        Assert.AreEqual(urlExpected, r);
+    }
+
+    [TestMethod]
+    public void Test_Url_Creation_Encodes_Params()
+    {
+        var baseUrl = "https://google.com/search";
+        var urlExpected = "https://google.com/search?hello+world=a%26b%3Dc";
+        var param = new List<RequestParam>
+        {
+            new("hello world", "a&b=c", Enums.RequestParamType.QueryString)
+        };
+
+        var r = Utils.BuildUrl(baseUrl, param);
+
+        Assert.AreEqual(urlExpected, r);
+    }
+
+    [TestMethod]
+    public void Test_Url_Creation_Preserves_Path_Trailing_Slash()
+    {
+        var baseUrl = "https://google.com/api/users/";
+        var urlExpected = "https://google.com/api/users/?woo=hoo";
+        var param = new List<RequestParam>
+        {
+            new("woo", "hoo", Enums.RequestParamType.QueryString)
+        };
+
+        var r = Utils.BuildUrl(baseUrl, param);
+
+        Assert.AreEqual(urlExpected, r);
+    }
+
+    [TestMethod]
+    public void Test_Url_Creation_Preserves_Fragment()
+    {
+        var baseUrl = "https://google.com/search#results";
+        var urlExpected = "https://google.com/search?woo=hoo#results";
+        var param = new List<RequestParam>
+        {
+            new("woo", "hoo", Enums.RequestParamType.QueryString)
+        };
+
+        var r = Utils.BuildUrl(baseUrl, param);
+
+        Assert.AreEqual(urlExpected, r);
+    }
+
+    [TestMethod]
+    public async Task Test_Response_String_Result()
+    {
+        using var message = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent("plain response")
+        };
+
+        var response = await message.BuildResponse<string>();
+
+        Assert.AreEqual("plain response", response.Result);
     }
 }
