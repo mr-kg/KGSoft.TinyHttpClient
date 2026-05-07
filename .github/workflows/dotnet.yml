@@ -14,15 +14,18 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      TEST_PROJECT_PATH: KGSoft.TinyHttpClient.Test/KGSoft.TinyHttpClient.Test.csproj
+
     steps:
     - uses: actions/checkout@v6
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore "$TEST_PROJECT_PATH"
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build "$TEST_PROJECT_PATH" --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test "$TEST_PROJECT_PATH" --no-build --verbosity normal

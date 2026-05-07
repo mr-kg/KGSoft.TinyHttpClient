@@ -14,6 +14,7 @@ jobs:
 
     env:
       PROJECT_PATH: KGSoft.TinyHttpClient/KGSoft.TinyHttpClient.csproj
+      TEST_PROJECT_PATH: KGSoft.TinyHttpClient.Test/KGSoft.TinyHttpClient.Test.csproj
       PACKAGE_OUTPUT: artifacts
 
     steps:
@@ -42,16 +43,16 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore "$TEST_PROJECT_PATH"
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build "$TEST_PROJECT_PATH" --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal
+        run: dotnet test "$TEST_PROJECT_PATH" --configuration Release --no-build --verbosity normal
 
       - name: Pack
         run: >
