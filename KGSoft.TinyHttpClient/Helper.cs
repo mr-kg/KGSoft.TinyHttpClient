@@ -121,13 +121,13 @@ public static class Helper
     /// <returns></returns>
     internal static async Task<Response<T>> MakeHttpRequest<T>(string url, HttpMethod method, string body = "", HttpContent content = null, CancellationToken tkn = default, HeaderConfig cfg = default)
     {
-        var message = content == null 
+        using var message = content == null 
             ? await GetResponseMessage(url, method, body, tkn, cfg)
             : await GetResponseMessage(url, method, content, tkn, cfg);
 
         var response = await message.BuildResponse<T>();
 
-        HandleLogging(response);
+        HandleLogging(response, cfg);
 
         return response;
     }
@@ -144,13 +144,13 @@ public static class Helper
     /// <returns></returns>
     internal static async Task<Response> MakeHttpRequest(string url, HttpMethod method, string body = "", HttpContent content = null, CancellationToken tkn = default, HeaderConfig cfg = default)
     {
-        var message = content == null
+        using var message = content == null
             ? await GetResponseMessage(url, method, body, tkn, cfg)
             : await GetResponseMessage(url, method, content, tkn, cfg);
 
         var response = await message.BuildResponse();
 
-        HandleLogging(response);
+        HandleLogging(response, cfg);
 
         return response;
     }
@@ -175,20 +175,37 @@ public static class Helper
     /// </summary>
     /// <param name="response"></param>
     /// <param name="message"></param>
-    private static void HandleLogging(Response response)
+    private static void HandleLogging(Response response, HeaderConfig cfg = default)
     {
-        if (HttpConfig.LogScope == Enums.LogScope.OnlyFailedRequests && !response.IsSuccess)
+        var logger = cfg?.Logger ?? HttpConfig.Logger;
+        if (logger == null)
+            return;
+
+        var logScope = cfg?.LogScope ?? HttpConfig.LogScope;
+
+        if (logScope == Enums.LogScope.OnlyFailedRequests && !response.IsSuccess)
             Log(response);
-        else if (HttpConfig.LogScope == Enums.LogScope.AllRequests)
+        else if (logScope == Enums.LogScope.AllRequests)
             Log(response);
 
         void Log(Response r)
         {
-            LogHelper.LogMessage(string.Format("{0}[ResponseCode]: {1} - {2}",
+            logger.LogMessage(string.Format("{0}[ResponseCode]: {1} - {2}",
                     response.IsSuccess ? string.Empty : "FAILED HTTP REQUEST - ",
                     response.StatusCode,
                     response.Message));
         }
+    }
+
+    private static void LogRequest(HttpMethod method, string url, HeaderConfig cfg = default)
+    {
+        var logger = cfg?.Logger ?? HttpConfig.Logger;
+        if (logger == null)
+            return;
+
+        var logScope = cfg?.LogScope ?? HttpConfig.LogScope;
+        if (logScope == Enums.LogScope.AllRequests)
+            logger.LogMessage($"[{method.Method}]: {url}");
     }
 
     /// <summary>
@@ -217,7 +234,7 @@ public static class Helper
         HttpRequestMessage request = new(method, url);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(HttpConfig.MediaTypeHeader));
 
-        LogHelper.LogMessage($"[{method.Method}]: {url}");
+        LogRequest(method, url, cfg);
 
         // Fire any pre-auth delegates before applying headers so mutations affect this request.
         HttpConfig.PreRequestAuthAction?.Invoke();

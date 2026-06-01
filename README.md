@@ -30,6 +30,8 @@ https://www.nuget.org/packages/KGSoft.TinyHttpClient/
 - Form-encoded request support
 - Custom `HttpContent` support
 - Global and per-request header configuration
+- Per-request Polly retry support
+- Configurable per-request JSON serialization settings
 - Reused `HttpClient` with configurable pooled connection lifetime, idle timeout, and request timeout
 - Logging support
 - Pre-request sync/async hooks for token acquisition or refresh
@@ -102,6 +104,23 @@ var response = await new HttpRequestBuilder()
     .MakeRequestAsync<User>();
 ```
 
+You can also provide the URI to the builder constructor and call the HTTP verb without a URI:
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/api/users/1")
+    .Get()
+    .MakeRequestAsync<User>();
+```
+
+Or set the URI fluently:
+
+```csharp
+var response = await new HttpRequestBuilder()
+    .WithUri("https://example.com/api/users/1")
+    .Get()
+    .MakeRequestAsync<User>();
+```
+
 ### Query Parameters
 
 ```csharp
@@ -117,12 +136,36 @@ var response = await new HttpRequestBuilder()
 ```csharp
 var response = await new HttpRequestBuilder()
     .Post("https://example.com/api/users")
-    .AddBody(new
+    .WithBody(new
     {
         first_name = "Jane",
         last_name = "Doe"
     })
     .MakeRequestAsync<User>();
+```
+
+### PATCH JSON Body
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/api/users/1")
+    .Patch()
+    .WithBody(new
+    {
+        first_name = "Jane"
+    })
+    .MakeRequestAsync<User>();
+```
+
+### HEAD and OPTIONS
+
+```csharp
+var headResponse = await new HttpRequestBuilder("https://example.com/api/users/1")
+    .Head()
+    .MakeRequestAsync();
+
+var optionsResponse = await new HttpRequestBuilder()
+    .Options("https://example.com/api/users")
+    .MakeRequestAsync();
 ```
 
 ### Form-Encoded Request
@@ -141,10 +184,12 @@ var response = await new HttpRequestBuilder()
 ```csharp
 var response = await new HttpRequestBuilder()
     .Get("https://example.com/api/users/1")
-    .AddHeader("X-Correlation-ID", correlationId)
-    .AddAuthorizationHeader("Bearer your-access-token")
+    .WithHeader("X-Correlation-ID", correlationId)
+    .WithBearerToken(accessToken)
     .MakeRequestAsync<User>();
 ```
+
+Calling `WithHeader` for the same header name replaces the previous value.
 
 ### Cancellation Token
 
@@ -153,7 +198,71 @@ using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
 var response = await new HttpRequestBuilder()
     .Get("https://example.com/api/users/1")
-    .AddCancellationToken(cts.Token)
+    .WithCancellationToken(cts.Token)
+    .MakeRequestAsync<User>();
+```
+
+### Custom Content
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/upload")
+    .Post()
+    .WithContent(() => new ByteArrayContent(fileBytes))
+    .MakeRequestAsync();
+```
+
+Prefer the `Func<HttpContent>` overload when using retry policies, because it creates fresh content for each retry attempt.
+
+### JSON Serialization Settings
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/api/users")
+    .Post()
+    .WithBody(user)
+    .WithJsonSerializerSettings(new JsonSerializerSettings
+    {
+        NullValueHandling = NullValueHandling.Ignore
+    })
+    .MakeRequestAsync<User>();
+```
+
+### Retry With Polly
+
+```csharp
+var retryPolicy = new ResiliencePipelineBuilder<Response>()
+    .AddRetry(new RetryStrategyOptions<Response>
+    {
+        ShouldHandle = new PredicateBuilder<Response>()
+            .HandleResult(response => !response.IsSuccess),
+        MaxRetryAttempts = 3,
+        Delay = TimeSpan.FromSeconds(1)
+    })
+    .Build();
+
+var response = await new HttpRequestBuilder()
+    .Get("https://example.com/api/users/1")
+    .WithRetry(retryPolicy)
+    .MakeRequestAsync<User>();
+```
+
+Builders are intended to compose and send one request. Create a new `HttpRequestBuilder` for each request so headers, body, content, and retry policy state do not carry over unexpectedly.
+
+### Per-Request Logging
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/api/users/1")
+    .Get()
+    .WithLogger(logger)
+    .MakeRequestAsync<User>();
+```
+
+`WithLogger` logs all request activity by default. Use `WithLogScope` to limit that request to failed responses:
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/api/users/1")
+    .Get()
+    .WithLogger(logger)
+    .WithLogScope(Enums.LogScope.OnlyFailedRequests)
     .MakeRequestAsync<User>();
 ```
 

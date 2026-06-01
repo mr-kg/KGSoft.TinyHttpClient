@@ -1,9 +1,12 @@
 using KGSoft.TinyHttpClient.Model;
+using KGSoft.TinyHttpClient.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
+using static KGSoft.TinyHttpClient.Enums;
 
 namespace KGSoft.TinyHttpClient;
 
@@ -33,14 +36,21 @@ public static class Utils
         return sb.ToString();
     }
 
-    public static HeaderConfig BuildHeaderConfig(Dictionary<string, string> headers)
+    public static HeaderConfig BuildHeaderConfig(
+        Dictionary<string, string> headers,
+        AuthenticationHeaderValue authHeader = null,
+        ILogger logger = null,
+        LogScope? logScope = null)
     {
-        if (headers.Count == 0)
+        if (headers.Count == 0 && authHeader == null && logger == null && logScope == null)
             return null;
         else
         {
             var cfg = new HeaderConfig
             {
+                AuthHeader = authHeader,
+                Logger = logger,
+                LogScope = logScope,
                 CustomHeaders = new Dictionary<string, string>()
             };
 
