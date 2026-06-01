@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using static KGSoft.TinyHttpClient.Enums;
@@ -40,9 +41,10 @@ public static class Utils
         Dictionary<string, string> headers,
         AuthenticationHeaderValue authHeader = null,
         ILogger logger = null,
-        LogScope? logScope = null)
+        LogScope? logScope = null,
+        HttpClient httpClient = null)
     {
-        if (headers.Count == 0 && authHeader == null && logger == null && logScope == null)
+        if (headers.Count == 0 && authHeader == null && logger == null && logScope == null && httpClient == null)
             return null;
         else
         {
@@ -51,6 +53,7 @@ public static class Utils
                 AuthHeader = authHeader,
                 Logger = logger,
                 LogScope = logScope,
+                HttpClient = httpClient,
                 CustomHeaders = new Dictionary<string, string>()
             };
 

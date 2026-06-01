@@ -1,5 +1,6 @@
 ﻿using KGSoft.TinyHttpClient.Logging;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using static KGSoft.TinyHttpClient.Enums;
 
@@ -23,4 +24,8 @@ public class HeaderConfig
     /// The LogScope to use for this request
     /// </summary>
     public LogScope? LogScope = null;
+    /// <summary>
+    /// The HttpClient to use for this request
+    /// </summary>
+    public HttpClient HttpClient = null;
 }
