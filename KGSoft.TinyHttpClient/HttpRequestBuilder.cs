@@ -419,6 +419,17 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
+    /// Sets a Microsoft.Extensions.Logging logger for this request. Defaults to logging all request activity unless WithLogScope is also specified.
+    /// </summary>
+    /// <param name="logger">The logger to use for this request.</param>
+    /// <returns>HttpRequestBuilder</returns>
+    public HttpRequestBuilder WithLogger(Microsoft.Extensions.Logging.ILogger logger)
+    {
+        _logger = new MicrosoftExtensionsLoggerAdapter(logger);
+        return this;
+    }
+
+    /// <summary>
     /// Sets the logging scope for this request.
     /// </summary>
     /// <param name="logScope">The log scope to use for this request.</param>

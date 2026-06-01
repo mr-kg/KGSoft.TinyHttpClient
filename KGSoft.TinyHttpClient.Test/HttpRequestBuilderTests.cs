@@ -314,6 +314,20 @@ public class HttpRequestBuilderTests : TestBase
     }
 
     [TestMethod]
+    public async Task Test_WithLogger_MicrosoftGenericLogger_DefaultsToAllRequests()
+    {
+        var logger = new MicrosoftTestLogger<HttpRequestBuilderTests>();
+
+        var response = await new HttpRequestBuilder($"{ApiBase}api/users/2")
+            .Get()
+            .WithLogger(logger)
+            .MakeRequestAsync();
+
+        AssertResponse(response);
+        Assert.AreEqual(2, logger.Messages.Count);
+    }
+
+    [TestMethod]
     public async Task Test_GET_WithRetry()
     {
         var retryCount = 0;
@@ -382,6 +396,31 @@ public class HttpRequestBuilderTests : TestBase
         public void LogException(Exception ex)
         {
             Exceptions.Add(ex);
+        }
+    }
+
+    private sealed class MicrosoftTestLogger<T> : Microsoft.Extensions.Logging.ILogger<T>
+    {
+        public List<string> Messages { get; } = new();
+        public List<Exception> Exceptions { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state)
+            => null;
+
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel)
+            => true;
+
+        public void Log<TState>(
+            Microsoft.Extensions.Logging.LogLevel logLevel,
+            Microsoft.Extensions.Logging.EventId eventId,
+            TState state,
+            Exception exception,
+            Func<TState, Exception, string> formatter)
+        {
+            if (exception != null)
+                Exceptions.Add(exception);
+
+            Messages.Add(formatter(state, exception));
         }
     }
 }
