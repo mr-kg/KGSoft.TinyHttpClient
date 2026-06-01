@@ -213,6 +213,17 @@ var response = await new HttpRequestBuilder("https://example.com/upload")
 
 Prefer the `Func<HttpContent>` overload when using retry policies, because it creates fresh content for each retry attempt.
 
+### Per-Request HttpClient
+
+```csharp
+var response = await new HttpRequestBuilder("https://example.com/api/users/1")
+    .Get()
+    .WithHttpClient(httpClient)
+    .MakeRequestAsync<User>();
+```
+
+When `WithHttpClient` is not used, requests use the shared pooled client managed by `HttpConfig`.
+
 ### JSON Serialization Settings
 
 ```csharp

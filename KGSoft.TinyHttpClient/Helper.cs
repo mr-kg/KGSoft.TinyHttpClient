@@ -259,7 +259,8 @@ public static class Helper
         if (content != null)
             request.Content = content;
 
-        var message = await HttpClientPool.Client.SendAsync(request, tkn);
+        var httpClient = cfg?.HttpClient ?? HttpClientPool.Client;
+        var message = await httpClient.SendAsync(request, tkn);
 
         // If we have any 401 actions defined, evaluate the result and fire them
         await HandlePostRequestUnauthorizedActions(message.StatusCode);

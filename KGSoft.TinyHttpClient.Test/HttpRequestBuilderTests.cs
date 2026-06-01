@@ -6,7 +6,9 @@ using Polly;
 using Polly.Retry;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -328,6 +330,22 @@ public class HttpRequestBuilderTests : TestBase
     }
 
     [TestMethod]
+    public async Task Test_WithHttpClient()
+    {
+        var handler = new TestHttpMessageHandler();
+        using var httpClient = new HttpClient(handler);
+
+        var response = await new HttpRequestBuilder("https://example.com/api/users/2")
+            .Get()
+            .WithHttpClient(httpClient)
+            .MakeRequestAsync();
+
+        AssertResponse(response);
+        Assert.AreEqual(1, handler.SendCount);
+        Assert.AreEqual("https://example.com/api/users/2", handler.LastRequestUri.ToString());
+    }
+
+    [TestMethod]
     public async Task Test_GET_WithRetry()
     {
         var retryCount = 0;
@@ -421,6 +439,23 @@ public class HttpRequestBuilderTests : TestBase
                 Exceptions.Add(exception);
 
             Messages.Add(formatter(state, exception));
+        }
+    }
+
+    private sealed class TestHttpMessageHandler : HttpMessageHandler
+    {
+        public int SendCount { get; private set; }
+        public Uri LastRequestUri { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            SendCount++;
+            LastRequestUri = request.RequestUri;
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"ok\":true}")
+            });
         }
     }
 }

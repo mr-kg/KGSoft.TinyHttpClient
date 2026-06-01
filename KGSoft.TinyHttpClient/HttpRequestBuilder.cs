@@ -25,6 +25,7 @@ public class HttpRequestBuilder
     private JsonSerializerSettings _serializerSettings;
     private ILogger _logger;
     private Enums.LogScope? _logScope;
+    private HttpClient _httpClient;
     private ResiliencePipeline<Response> _retryPolicy;
 
     private bool HasFormParams => _requestParams.Any(x => x.Type == Enums.RequestParamType.FormEncoded);
@@ -441,6 +442,17 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
+    /// Sets the HttpClient to use for this request.
+    /// </summary>
+    /// <param name="httpClient">The HttpClient to use for this request.</param>
+    /// <returns>HttpRequestBuilder</returns>
+    public HttpRequestBuilder WithHttpClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        return this;
+    }
+
+    /// <summary>
     /// Adds a Polly resilience pipeline to execute this request with retry behavior.
     /// </summary>
     /// <param name="retryPolicy">The Polly resilience pipeline to execute the request with.</param>
@@ -464,7 +476,7 @@ public class HttpRequestBuilder
             SerializeBody(),
             BuildContent(),
             _cancellationToken,
-            Utils.BuildHeaderConfig(_headers, _authHeader, _logger, BuildLogScope())));
+            BuildRequestConfig()));
     }
 
     /// <summary>
@@ -480,7 +492,7 @@ public class HttpRequestBuilder
             SerializeBody(),
             BuildContent(),
             _cancellationToken, 
-            Utils.BuildHeaderConfig(_headers, _authHeader, _logger, BuildLogScope())));
+            BuildRequestConfig()));
     }
 
     private void Validate()
@@ -498,6 +510,9 @@ public class HttpRequestBuilder
 
     private Enums.LogScope? BuildLogScope()
         => _logScope ?? (_logger != null ? Enums.LogScope.AllRequests : null);
+
+    private HeaderConfig BuildRequestConfig()
+        => Utils.BuildHeaderConfig(_headers, _authHeader, _logger, BuildLogScope(), _httpClient);
 
     private HttpContent BuildContent()
     {
