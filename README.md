@@ -256,6 +256,8 @@ var response = await new HttpRequestBuilder("https://example.com/api/users/1")
     .MakeRequestAsync<User>();
 ```
 
+`WithLogger` accepts either `KGSoft.TinyHttpClient.Logging.ILogger` or `Microsoft.Extensions.Logging.ILogger`, including `ILogger<T>`.
+
 `WithLogger` logs all request activity by default. Use `WithLogScope` to limit that request to failed responses:
 
 ```csharp
